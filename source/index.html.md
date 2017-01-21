@@ -1,192 +1,110 @@
 ---
-title: IOTA API Reference
+title: Javascript Library Documentation
 
 language_tabs:
-  - shell: Shell
-  - ruby: Ruby
-  - python: Python
   - javascript: JavaScript
 
 toc_footers:
-  - <a href='#'>Sign Up for a Developer Key</a>
-  - <a href='https://github.com/tripit/slate' target='_blank'>Documentation Powered by Slate</a>
+  - <a href='#'>IOTA Sandbox</a>
+  - <a href='#'>IOTA Core Documentation</a>
+  - <a href='#'>Other Libraries</a>
 
 includes:
-  - errors
-  - intro
-  - installation
-  - documentation
+  - api
+  - multisig
+  - utils
+  - validate
 
 search: true
 ---
 
 # Introduction
 
-Welcome to the Kittn API! You can use our API to access Kittn API endpoints, which can get information on various cats, kittens, and breeds in our database.
-
-We have language bindings in Shell, Ruby, and Python! You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.
-
-This example API documentation page was created with [Slate](https://github.com/tripit/slate). Feel free to edit it and use it as a base for your own API's documentation.
-
-# Authentication
-
-> To authorize, use this code:
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-```
-
-```shell
-# With shell, you can just pass the correct header with each request
-curl "api_endpoint_here"
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-```
-
-> Make sure to replace `meowmeowmeow` with your API key.
-
-Kittn uses API keys to allow access to the API. You can register a new Kittn API key at our [developer portal](http://example.com/developers).
-
-Kittn expects for the API key to be included in all API requests to the server in a header that looks like the following:
-
-`Authorization: meowmeowmeow`
+This is the official Javascript library for the IOTA Core. It implements both the [official API](https://iota.readme.io/), API wrapper functions as well as newly proposed functionality (such as signing, bundles, utilities and conversion).
 
 <aside class="notice">
-You must replace <code>meowmeowmeow</code> with your personal API key.
+    It should be noted that the Javascript Library as it stands right now is an **early beta release**. As such, there might be some unexpected results. Please join the community (see links below) and post [issues on here](https://github.com/iotaledger/iota.lib.js/issues), to ensure that the developers of the library can improve it.
 </aside>
 
-# Kittens
+> **Join the Discussion**
 
-## Get All Kittens
+> If you want to get involved in the community, need help with getting setup, have any issues related with the library or just want to discuss Blockchain, Distributed Ledgers and IoT with other people, feel free to join our Slack. [Slack](http://slack.iotatoken.com/) You can also ask questions on our dedicated forum at: [IOTA Forum](https://forum.iotatoken.com/).
 
-```ruby
-require 'kittn'
+---
 
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get
+# Installation
+
+```
+npm install iota.lib.js
+```
+<br>
+<br>
+<br>
+<br>
+
+```
+bower install iota.lib.js
 ```
 
-```python
-import kittn
+The Javascript library can be easily installed either via `npm` or via `bower`. You can also directly use the browserify'ed version, which can be found in the `dist` [folder](https://github.com/iotaledger/iota.lib.js/tree/master/dist) or you can compile it yourself by cloning the repo and running `gulp`.You can either use `iota.js` or the minified version `iota.min.js` in the browser.
 
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get()
+
+
+---
+
+
+# Getting Started
+
+```
+// Create IOTA instance with host and port as provider
+var iota = new IOTA({
+    'host': 'http://localhost',
+    'port': 14265
+});
+
+// Create IOTA instance directly with provider
+var iota = new IOTA({
+    'provider': 'http://localhost:14265'
+});
+
+// now you can start using all of the functions
+iota.api.getNodeInfo();
 ```
 
-```shell
-curl "http://example.com/api/kittens"
-  -H "Authorization: meowmeowmeow"
+After you've successfully installed the library, it is fairly easy to get started by simply launching a new instance of the IOTA object with an optional settings object. When instantiating the object you have the option to decide the API provider that is used to send the requests to and you can also connect directly to the Sandbox environment.
+
+The optional settings object can have the following values:
+
+1. **`host`**: `String` Host you want to connect to. Can be DNS, IPv4 or IPv6. Defaults to `localhost `
+2. **`port`**: `Int` port of the host you want to connect to. Defaults to 14265.
+3. **`provider`**: `String` If you don't provide host and port, you can supply the full provider value to connect to
+4. **`sandbox`**: `Bool` Optional value to determine if your provider is the IOTA Sandbox or not.
+
+You can either supply the remote node directly via the `provider` option, or individually with `host` and `port`, as can be seen in the example on the right.
+
+Overall, there are currently four subclasses that are accessible from the IOTA object:
+
+- **`api`**: Core API functionality for interacting with the IOTA core.
+- **`utils`**: Utility related functions for conversions, validation and so on  
+- **`multisig`**: Functions for creating and signing multi-signature addresses and transactions.
+- **`validate`**: Validator functions that can help with determining whether the inputs or results that you get are valid.
+
+In the future new IOTA Core modules (such as Flash, MAM) and all IXI related functionality will be available.
+
+## How to use the Library
+
+```
+iota.api.getNodeInfo(function(error, success) {
+    if (error) {
+        console.error(error);
+    } else {
+        console.log(success);
+    }
+})
 ```
 
-```javascript
-const kittn = require('kittn');
+It should be noted that most API calls are done asynchronously. What this means is that you have to utilize callbacks in order to catch the response successfully. We will add support for sync API calls, as well as event listeners in future versions.
 
-let api = kittn.authorize('meowmeowmeow');
-let kittens = api.kittens.get();
-```
+On the right is a simple example of how to access the `getNodeInfo` function.
 
-> The above command returns JSON structured like this:
-
-```json
-[
-  {
-    "id": 1,
-    "name": "Fluffums",
-    "breed": "calico",
-    "fluffiness": 6,
-    "cuteness": 7
-  },
-  {
-    "id": 2,
-    "name": "Max",
-    "breed": "unknown",
-    "fluffiness": 5,
-    "cuteness": 10
-  }
-]
-```
-
-This endpoint retrieves all kittens.
-
-### HTTP Request
-
-`GET http://example.com/api/kittens`
-
-### Query Parameters
-
-Parameter | Default | Description
---------- | ------- | -----------
-include_cats | false | If set to true, the result will also include cats.
-available | true | If set to false, the result will include kittens that have already been adopted.
-
-<aside class="success">
-Remember — a happy kitten is an authenticated kitten!
-</aside>
-
-## Get a Specific Kitten
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```shell
-curl "http://example.com/api/kittens/2"
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.get(2);
-```
-
-> The above command returns JSON structured like this:
-
-```json
-{
-  "id": 2,
-  "name": "Max",
-  "breed": "unknown",
-  "fluffiness": 5,
-  "cuteness": 10
-}
-```
-
-This endpoint retrieves a specific kitten.
-
-<aside class="warning">Inside HTML code blocks like this one, you can't use Markdown, so use <code>&lt;code&gt;</code> blocks to denote code.</aside>
-
-### HTTP Request
-
-`GET http://example.com/kittens/<ID>`
-
-### URL Parameters
-
-Parameter | Description
---------- | -----------
-ID | The ID of the kitten to retrieve
-
+---
