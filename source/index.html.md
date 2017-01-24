@@ -1,23 +1,21 @@
 ---
-title: PyOTA Reference
+title: PyOTA Documentation
 
-language_tabs:
-  - python: Python
-
-toc_footers:
-  
+includes:
+  - types
+  - api
 
 search: true
 ---
 
 # Introduction
-
 This is PyOTA, the official Python library for the IOTA Core.
 It implements both the [official API](https://iota.readme.io/), API wrapper functions as well as newly proposed functionality (such as signing, bundles, utilities and conversion).
 
 <aside class="notice">
   IOTA is still in early development stages.
   There may be performance or stability issues.
+
   Please report any bugs using the <a href="https://github.com/iotaledger/iota.lib.py/issues">PyOTA Bug Tracker</a>.
 </aside>
 
