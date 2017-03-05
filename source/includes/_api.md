@@ -114,9 +114,10 @@ Generates one or more new addresses from the seed.
    - If ``None``, this method will scan the Tangle to find the next available unused address and return that.
 
 ### Return
-This method returns a `list` of `Address` objects.
+This method returns a `dict` with the following items:
 
-Note that this method always returns a `list`, even if only one `Address` was generated.
+- `addresses: List[Address]`: The generated address(es).
+  Note that this value is always a list, even if only one address was generated.
 
 ## `get_transfers`
 Returns all transfers associated with the seed.
