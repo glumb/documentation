@@ -3,6 +3,7 @@ title: PyOTA Documentation
 
 includes:
   - types
+  - addresses
   - api
 
 search: true
