@@ -20,6 +20,42 @@ This method returns a `dict` with the following items:
 - `trytes: List[TransactionTrytes]`: Transaction trytes that were broadcast/stored.
   Should be the same as the value of the `trytes` parameter. 
 
+## `get_account_data`
+More comprehensive version of `get_transfers` that returns addresses and account
+balance in addition to bundles.
+
+This function is useful in getting all the relevant information of
+your account.
+
+### Parameters
+- `start: int`: Starting key index.
+
+- `stop: Optional[int]`: Stop before this index.
+  Note that this parameter behaves like the `stop` attribute in a
+  `slice` object; the stop index is *not* included in the result.
+
+  - If ``None`` (default), then this method will check every address
+    until it finds one without any transfers.
+
+- `inclusion_states: bool`
+  Whether to also fetch the inclusion states of the transfers.
+  This requires an additional API call to the node, so it is
+  disabled by default.
+
+### Return
+This method returns a dict with the following items:
+
+
+- `addresses: List[Address]`:
+  List of generated addresses.
+  Note that this list may include unused addresses.
+
+- `balance: int`:
+  Total account balance.  Might be 0.
+
+- `bundles: List[Bundles]`:
+  List of bundles with transactions to/from this account.
+
 ## `get_bundles`
 Given a `TransactionHash`, returns the bundle(s) associated with it.
 
