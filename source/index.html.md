@@ -4,6 +4,7 @@ title: PyOTA Documentation
 includes:
   - types
   - addresses
+  - adapters
   - api
 
 search: true
