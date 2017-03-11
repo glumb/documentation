@@ -94,3 +94,80 @@ reverse order!
 - `create_iterator: (int, int) -> Generator[Address]`: Returns an iterator that
   will create addresses endlessly.  Use this if you have a feature that needs
   to generate addresses "on demand".
+
+# Address Caches
+```python
+from iota.crypto.addresses import AddressGenerator, MemoryAddressCache
+
+# Install a global address cache.
+AddressGenerator.cache = MemoryAddressCache()
+
+cache = MemoryAddressCache()
+
+# Activate the address cache just for this generator instance.
+generator = AddressGenerator(b'SEED9GOES9HERE')
+generator.cache = cache
+```
+
+Generating addresses can be a CPU-intensive task, especially if you find
+yourself generating the same addresses over and over.  To eliminate all of this
+redundant work, you can install an address cache.
+
+PyOTA currently only defines a single type of address cache, which stores
+addresses in memory.  If desired, you can write a custom address cache that
+uses a more permanent storage backend (database, filesystem, etc.).
+
+To install the address cache globally, attach it to the `AddressGenerator`
+class.  This will activate the address cache for all API calls, as well as
+any addresses created by `AddressGenerator`.
+
+If desired, you can activate the cache only for specific `AddressGenerator`
+instances.
+
+Note that API methods will only use the global address cache; there is no way to
+specify an address cache that will be used just by API methods.
+
+## Writing Your Own Address Cache
+```python
+class BaseAddressCache(with_metaclass(ABCMeta)):
+  @abstract_method
+  def get(self, seed, index):
+    # type: (Seed, int) -> Optional[Address]
+    """
+    Retrieves an address from the cache.
+    Returns ``None`` if the address hasn't been cached yet.
+    """
+
+  @abstract_method
+  def set(self, seed, index, address):
+    # type: (Seed, int, Address) -> None
+    """
+    Adds an address to the cache, overwriting the existing address if
+    set.
+    """
+```
+
+To write your own address cache, extend the `BaseAddressCache` command.  You
+will need to implement its `get` and `set` methods, used to retrieve and store
+addresses, respectively.
+
+<aside class="notice">
+  <p>
+    <code>BaseAddressCache</code> also defines
+    <code>_gen_cache_key(seed, index)</code> to hash the seed before using it as
+    part of the cache key.  Be sure to take advantage of this method when
+    writing your own address cache class.
+  </p>
+
+  <p>
+    This is especially important when using a permanent storage backend such as
+    a database or filesystem.
+  </p>
+
+  <p>
+    Please do not store your users' seeds in cleartext!
+  </p>
+</aside>
+
+For more information, refer to the implementation of
+`iota.crypto.addresses.MemoryAddressCache`.
