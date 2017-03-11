@@ -53,7 +53,7 @@ security reasons.
 Once you've gotten access to an IOTA node, initialize an `iota.Iota` object with
 the URI of the node, and optional seed.
 
-Note: If you are connecting no the sandbox node, you will need a little extra
+Note: If you are connecting to the sandbox node, you will need a little extra
 code; see below.
 
 ```python
