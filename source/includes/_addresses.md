@@ -171,3 +171,31 @@ addresses, respectively.
 
 For more information, refer to the implementation of
 `iota.crypto.addresses.MemoryAddressCache`.
+
+## Thread-Safety
+```python
+from multiprocessing import Lock
+from iota.crypto.addresses import AddressGenerator, MemoryAddressCache
+
+# Change the locking mechanism to support multiprocessing.
+MemoryAddressCache.LockType = Lock
+
+# Activate the cache *after* setting the lock type.
+AddressGenerator.cache = MemoryAddressCache()
+```
+
+Address caches use a locking mechanism to ensure thread-safety (prevents invalid
+cache misses when multiple threads access the cache concurrently).
+
+The default lock type is `threading.Lock`.  This lock type works for
+multi-threaded applications, but it may cause unexpected behavior if your
+application relies on multiprocessing or needs some type of distributed locking
+mechanism.
+
+To change the locking mechanism used by the cache, change its `LockType`
+attribute.
+
+<aside class="notice">
+  Be sure to do this <strong>before</strong> creating the cache object; once a
+  cache instance is created, its locking mechanism cannot be changed.
+</aside>
