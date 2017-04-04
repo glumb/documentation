@@ -180,7 +180,7 @@ Prepares a set of transfers and creates the bundle, then attaches the bundle to 
 ### Return
 This method returns a `dict` with the following items:
 
-- `trytes: List[TransactionTrytes]`: Raw trytes that were published to the Tangle.
+- `bundle: Bundle`: The newly-published bundle.
 
 ## `send_trytes`
 Attaches transaction trytes to the Tangle, then broadcasts and stores them.
