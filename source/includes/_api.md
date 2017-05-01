@@ -112,6 +112,7 @@ Generates one or more new addresses from the seed.
 - `index: int`: Specify the index of the new address (must be >= 1).
 - `count: Optional[int]`: Number of addresses to generate (must be >= 1).
    - If ``None``, this method will scan the Tangle to find the next available unused address and return that.
+- `security_level: int`: Number of iterations to use when generating new addresses.  Lower values generate addresses faster, higher values result in more secure signatures in transactions.
 
 ### Return
 This method returns a `dict` with the following items:

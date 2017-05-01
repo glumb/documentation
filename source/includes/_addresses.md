@@ -47,6 +47,8 @@ using the following parameters:
   - If `None`, the API will generate addresses until it finds one that has not
     been used (has no transactions associated with it on the Tangle).  It will
     then return the unused address and discard the rest.
+- `security_level: int`: Determines the security level of the generated
+  addresses.  See [Security Levels](#security-levels) below.
 
 `get_new_addresses` returns a dict with the following items:
 
@@ -95,6 +97,30 @@ reverse order!
   will create addresses endlessly.  Use this if you have a feature that needs
   to generate addresses "on demand".
 
+# Security Levels
+```python
+gna_result = api.get_new_addresses(security_level=3)
+
+generator =\
+  AddressGenerator(
+    seed = b'SEED9GOES9HERE',
+    security_level = 3,
+  )
+```
+
+If desired, you may change the number of iterations that `AddressGenerator` uses
+internally when generating new addresses, by specifying a different
+`security_level` when creating a new instance.
+
+`security_level` should be between 1 and 3, inclusive.  Values outside this
+range are not supported by the IOTA protocol.
+
+Use the following guide when deciding which security level to use:
+
+- `security_level=1`: Least secure, but generates addresses the fastest.
+- `security_level=2`: Default; good compromise between speed and security.
+- `security_level=3`: Most secure; results in longer signatures in transactions.
+
 # Address Caches
 ```python
 from iota.crypto.addresses import AddressGenerator, MemoryAddressCache
@@ -131,16 +157,16 @@ specify an address cache that will be used just by API methods.
 ```python
 class BaseAddressCache(with_metaclass(ABCMeta)):
   @abstract_method
-  def get(self, seed, index):
-    # type: (Seed, int) -> Optional[Address]
+  def get(self, seed, index, security_level):
+    # type: (Seed, int, int) -> Optional[Address]
     """
     Retrieves an address from the cache.
     Returns ``None`` if the address hasn't been cached yet.
     """
 
   @abstract_method
-  def set(self, seed, index, address):
-    # type: (Seed, int, Address) -> None
+  def set(self, seed, index, security_level, address):
+    # type: (Seed, int, int, Address) -> None
     """
     Adds an address to the cache, overwriting the existing address if
     set.
@@ -153,10 +179,10 @@ addresses, respectively.
 
 <aside class="notice">
   <p>
-    <code>BaseAddressCache</code> also defines
-    <code>_gen_cache_key(seed, index)</code> to hash the seed before using it as
-    part of the cache key.  Be sure to take advantage of this method when
-    writing your own address cache class.
+    <code>BaseAddressCache</code> also defines a <code>_gen_cache_key</code>
+    method to hash the seed before using it as part of the cache key.
+    Be sure to take advantage of this method when writing your own address cache
+    class.
   </p>
 
   <p>
