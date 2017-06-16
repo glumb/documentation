@@ -15,6 +15,27 @@ financial service.
     These performance issues will be fixed in a future version of the library;
     please bear with us!
   </p>
+
+  <p>
+    In the meantime, if you are using Python 3, you can install a C extension
+    that boosts PyOTA's performance significantly (speedups of 60x are common!).
+  </p>
+
+  <p>
+    To install the extension, run <code>pip install pyota[ccurl]</code>.
+  </p>
+
+  <p>
+    <strong>Important:</strong> The extension is not yet compatible with Python
+    2.
+  </p>
+
+  <p>
+    If you are familiar with Python 2's C API, we'd love to hear from you!
+    Check the
+    <a href="https://github.com/todofixthis/pyota-ccurl/issues/4">GitHub issue</a>
+    for more information.
+  </p>
 </aside>
 
 PyOTA provides two methods for generating addresses:
@@ -54,11 +75,6 @@ using the following parameters:
 
 - `addresses: List[Address]`: The generated address(es).
   Note that this value is always a list, even if only one address was generated.
-
-<aside class="notice">
-  For better performance, it is recommended that you install an address cache
-  (see below).
-</aside>
 
 ## Using AddressGenerator
 ```python
@@ -120,108 +136,3 @@ Use the following guide when deciding which security level to use:
 - `security_level=1`: Least secure, but generates addresses the fastest.
 - `security_level=2`: Default; good compromise between speed and security.
 - `security_level=3`: Most secure; results in longer signatures in transactions.
-
-# Address Caches
-```python
-from iota.crypto.addresses import AddressGenerator, MemoryAddressCache
-
-# Install a global address cache.
-AddressGenerator.cache = MemoryAddressCache()
-
-cache = MemoryAddressCache()
-
-# Activate the address cache just for this generator instance.
-generator = AddressGenerator(b'SEED9GOES9HERE')
-generator.cache = cache
-```
-
-Generating addresses can be a CPU-intensive task, especially if you find
-yourself generating the same addresses over and over.  To eliminate all of this
-redundant work, you can install an address cache.
-
-PyOTA currently only defines a single type of address cache, which stores
-addresses in memory.  If desired, you can write a custom address cache that
-uses a more permanent storage backend (database, filesystem, etc.).
-
-To install the address cache globally, attach it to the `AddressGenerator`
-class.  This will activate the address cache for all API calls, as well as
-any addresses created by `AddressGenerator`.
-
-If desired, you can activate the cache only for specific `AddressGenerator`
-instances.
-
-Note that API methods will only use the global address cache; there is no way to
-specify an address cache that will be used just by API methods.
-
-## Writing Your Own Address Cache
-```python
-class BaseAddressCache(with_metaclass(ABCMeta)):
-  @abstract_method
-  def get(self, seed, index, security_level):
-    # type: (Seed, int, int) -> Optional[Address]
-    """
-    Retrieves an address from the cache.
-    Returns ``None`` if the address hasn't been cached yet.
-    """
-
-  @abstract_method
-  def set(self, seed, index, security_level, address):
-    # type: (Seed, int, int, Address) -> None
-    """
-    Adds an address to the cache, overwriting the existing address if
-    set.
-    """
-```
-
-To write your own address cache, extend the `BaseAddressCache` command.  You
-will need to implement its `get` and `set` methods, used to retrieve and store
-addresses, respectively.
-
-<aside class="notice">
-  <p>
-    <code>BaseAddressCache</code> also defines a <code>_gen_cache_key</code>
-    method to hash the seed before using it as part of the cache key.
-    Be sure to take advantage of this method when writing your own address cache
-    class.
-  </p>
-
-  <p>
-    This is especially important when using a permanent storage backend such as
-    a database or filesystem.
-  </p>
-
-  <p>
-    Please do not store your users' seeds in cleartext!
-  </p>
-</aside>
-
-For more information, refer to the implementation of
-`iota.crypto.addresses.MemoryAddressCache`.
-
-## Thread-Safety
-```python
-from multiprocessing import Lock
-from iota.crypto.addresses import AddressGenerator, MemoryAddressCache
-
-# Change the locking mechanism to support multiprocessing.
-MemoryAddressCache.LockType = Lock
-
-# Activate the cache *after* setting the lock type.
-AddressGenerator.cache = MemoryAddressCache()
-```
-
-Address caches use a locking mechanism to ensure thread-safety (prevents invalid
-cache misses when multiple threads access the cache concurrently).
-
-The default lock type is `threading.Lock`.  This lock type works for
-multi-threaded applications, but it may cause unexpected behavior if your
-application relies on multiprocessing or needs some type of distributed locking
-mechanism.
-
-To change the locking mechanism used by the cache, change its `LockType`
-attribute.
-
-<aside class="notice">
-  Be sure to do this <strong>before</strong> creating the cache object; once a
-  cache instance is created, its locking mechanism cannot be changed.
-</aside>
